@@ -7,19 +7,26 @@ Created on Tue Nov 26 15:01:46 2019
 """
 import requests,sys
 
-i = int(input('Input the number of ORFs you would like to use'))
-ORFs = []
+# Ask how many ORFs the user wants to use
+n = input('Input the number of ORFs you would like to use')
 
-for i in range(i):
-    ORF = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
-    ORFs.append(ORF)
+IDs = {}    # A dictionary of BASIC part names (Keys) and Ensembl IDs (Values)
+BASICs = {} # A dictionary of BASIC part names (Keys) and BASIC sequence (Values)
+
+# Ask for each Ensembl ID and add it to the IDs list
+for i in range(int(n)):
+    ID  = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
+    Key = input('And now an identifying 3 letter short code: ')
+    IDs[ID] = 'BASIC_'+ Key + '_ORF'
     
+# Retrieve the ORF sequence from Ensembl and add BASIC iP/iS
 server = "https://rest.ensembl.org"
-ORF_seqs = []
-for ext in ORFs:
-    r = requests.get(server+'/sequence/id/'+ext,headers={"Content-type" : "text/plain"})
+for ID in IDs:
+    r = requests.get(server+'/sequence/id/'+ID,headers={"Content-type" : "text/plain"})
     if not r.ok:
         sys.exit()
-    ORF_seqs.append(r.text)
-    
+    BASICs[IDs[ID]] = 'GGTCTC' + r.text + 'GAGACC' 
+
+# Say a Lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
+
     
