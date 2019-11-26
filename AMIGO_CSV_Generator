@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Nov 26 15:01:46 2019
-
 @author: Tom
 """
-import requests,sys
+import requests
 
 # Ask how many ORFs the user wants to use
 n = input('Input the number of ORFs you would like to use')
@@ -23,10 +22,6 @@ for i in range(int(n)):
 server = "https://rest.ensembl.org"
 for ID in IDs:
     r = requests.get(server+'/sequence/id/'+ID,headers={"Content-type" : "text/plain"})
-    if not r.ok:
-        sys.exit()
     BASICs[IDs[ID]] = 'GGTCTC' + r.text + 'GAGACC' 
 
-# Say a Lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
-
-    
+# Say a lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
