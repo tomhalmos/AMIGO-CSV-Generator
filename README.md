@@ -2,6 +2,8 @@
 
 The code will generate the CSV file for DNA-BOT taking three ORFs and desired gene ratios as inputs. Unless specified, the plasmid, promoter and UTRs will have default settings.
 
+So I've made one Python file and will add it to this repository. Pick a task from the below, fork the Python file, work on your code and then when it's ready, merge it into the master file. If your bit of code needs inputs from another bit just input your own variables when testing it and we'll sort that out when we stitch it all together. If anyone (Will) knows a better way to use GitHub pls explain aha. 
+
 Code needs to be written to:
 1) Take three ORFs and the gene ratios as user input
   -- Allow input of PDB ID?
@@ -14,3 +16,5 @@ Code needs to be written to:
 5) Take the one line CSV and generate all possible combinations
   -- Keeping RBS with ORF
   -- Plasmid/promoter parts don't move
+
+
