@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov 26 15:01:46 2019
+
+@author: Tom
+"""
+import requests,sys
+
+i = int(input('Input the number of ORFs you would like to use'))
+ORFs = []
+
+for i in range(i):
+    ORF = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
+    ORFs.append(ORF)
+    
+server = "https://rest.ensembl.org"
+ORF_seqs = []
+for ext in ORFs:
+    r = requests.get(server+'/sequence/id/'+ext,headers={"Content-type" : "text/plain"})
+    if not r.ok:
+        sys.exit()
+    ORF_seqs.append(r.text)
+    
+    
