@@ -18,10 +18,10 @@ for i in range(int(n)):
     Key = input('And now an identifying 3 letter short code: ')
     IDs[ID] = 'BASIC_'+ Key + '_ORF'
     
-# Retrieve the ORF sequence from Ensembl and add BASIC iP/iS
+# Retrieve the ORF sequence from Ensembl and add BASIC iP/iS 
 server = "https://rest.ensembl.org"
 for ID in IDs:
     r = requests.get(server+'/sequence/id/'+ID,headers={"Content-type" : "text/plain"})
-    BASICs[IDs[ID]] = 'GGTCTC' + r.text + 'GAGACC' 
+    BASICs[IDs[ID]] = 'TCTGGTGGGTCTCTGTCC' + r.text + 'GGCTCGGGAGACCTATCG' 
 
 # Say a lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
