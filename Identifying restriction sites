@@ -1,0 +1,45 @@
+#I am doing this in a separate document because I am not sure what I'm doing pls help
+
+
+import re
+
+r = "atgggtctcggttggtattggtctcttag"
+r = r.upper()
+print(r)
+matches = re.finditer(r"GGTCTC", r) 
+for m in matches: 
+    base = m.group() 
+    pos  = m.start()
+    print(base + " found at position " + str(pos))
+    if pos % 3 == 0:
+        #r = "".join((r[:pos],"GGG",r[pos+3:])) #Replace just Gly?? 
+        #r = "".join((r[:pos+3],"TTA",r[pos+6:])) #Replace just Leu??
+        r= "".join((r[:pos],"GGGTTA",r[pos+6:]))
+        print(r)
+    else:
+        p = pos % 3
+        pos2 = pos - p
+        c1 = r[pos2:pos2+3]
+        c2 = r[pos2+3:pos2+6]
+        c3 = r[pos2+6:pos2+9]
+        print(c1, c2, c3)
+        #this finds the three codons that are affected by the restriction site
+        #but then I got stuck
+        #search dictionary and replace with one of the other ones
+        
+codon2aa = {"AAA":"K", "AAC":"N", "AAG":"K", "AAU":"N", 
+            "ACA":"T", "ACC":"T", "ACG":"T", "ACU":"T", 
+            "AGA":"R", "AGC":"S", "AGG":"R", "AGU":"S", 
+            "AUA":"I", "AUC":"I", "AUG":"M", "AUU":"I", 
+            "CAA":"Q", "CAC":"H", "CAG":"Q", "CAU":"H", 
+            "CCA":"P", "CCC":"P", "CCG":"P", "CCU":"P", 
+            "CGA":"R", "CGC":"R", "CGG":"R", "CGU":"R", 
+            "CUA":"L", "CUC":"L", "CUG":"L", "CUU":"L", 
+            "GAA":"E", "GAC":"D", "GAG":"E", "GAU":"D", 
+            "GCA":"A", "GCC":"A", "GCG":"A", "GCU":"A", 
+            "GGA":"G", "GGC":"G", "GGG":"G", "GGU":"G", 
+            "GUA":"V", "GUC":"V", "GUG":"V", "GUU":"V", 
+            "UAA":"_", "UAC":"Y", "UAG":"_", "UAU":"T", 
+            "UCA":"S", "UCC":"S", "UCG":"S", "UCU":"S", 
+            "UGA":"_", "UGC":"C", "UGG":"W", "UGU":"C", 
+            "UUA":"L", "UUC":"F", "UUG":"L", "UUU":"F"}
