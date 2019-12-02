@@ -11,6 +11,7 @@ Code needs to be written to:
 TOM: 1) Take up to five ORFs as PBD IDs as user input and reuturn BASIC sequence
       -- Look up sequence in PBD
       -- Add standardised prefix/suffix sequences
+      -- ADDITION: we need to search the sequence for any internal BsaI sites and remove them!
       -- Generate standardised name
       -- Add to a local registry of parts
      2) Take the desired gene ratio as input 
