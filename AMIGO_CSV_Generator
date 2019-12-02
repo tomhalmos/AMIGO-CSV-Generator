@@ -22,7 +22,7 @@ for i in range(int(n)):
 server = "https://rest.ensembl.org"
 for ID in IDs:
     r = requests.get(server+'/sequence/id/'+ID,headers={"Content-type" : "text/plain"})
-    #search seqence for BsaI sites
+    #search sequence for BsaI sites
     #replace any BsaI sites without changing amino acids- might have trouble with frame reading but should be able to just replace codons
     #search new sequence again to check its now fixed
     BASICs[IDs[ID]] = 'TCTGGTGGGTCTCTGTCC' + r.text + 'GGCTCGGGAGACCTATCG' 
