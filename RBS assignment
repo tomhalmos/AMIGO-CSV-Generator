@@ -1,3 +1,5 @@
+#I started and then immediately gave up :)
+
 ratio = input('Enter the ratio of these ORFs in the format 1,2,3: ')
 
 RBSstrength = {"RBS-A12": 0,
