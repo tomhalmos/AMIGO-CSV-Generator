@@ -29,21 +29,4 @@ for ID in IDs:
 
 # Say a lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
 
-ratio = input('Enter the ratio of these ORFs in the format 1,2,3: ')
 
-RBSstrength = {"RBS-A12": 0,
-               "RBS-A06": 1,
-               "RBS-A11": 1,
-               "RBS-A02": 3,
-               "RBS-A04": 3,
-               "RBS-A05": 4,
-               "RBS1": 5,
-               "RBS-A09": 14,
-               "RBS-A01": 23,
-               "RBS-A08": 35,
-               "RBS-A03": 46,
-               "RBS-A10": 54,
-               "RBS2": 56,
-               "RBS-A07": 69,
-               "RBS3": 100}
-#I have no idea how to get this to calculate which RBS matches which ratio???
