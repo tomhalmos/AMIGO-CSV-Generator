@@ -31,6 +31,9 @@ for ID in IDs:
 # Say a lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
 
 #The below checks for BsaI restriction sites in the BASIC sequences, and switches codons (keeping AAs the same)
+#If the BsaI site is inframe, 'GGT CTC' is changed to 'GGC CTC'
+#If the BsaI site is 1 step out of frame, 'NGG TCT CNN' is changed to 'NGG TCC CNN'
+#If the BsaI site is 2 steps out, 'NNG GTC TCN' is changed to 'NNG GTT TCN'
 BsaI = 'GGTCTC'
 BsaI_site = re.compile(BsaI)
 
