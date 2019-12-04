@@ -5,6 +5,7 @@ Created on Tue Nov 26 15:01:46 2019
 @author: Tom
 """
 import requests
+import re
 
 # Ask how many ORFs the user wants to use
 n = input('Input the number of ORFs you would like to use')
@@ -29,4 +30,19 @@ for ID in IDs:
 
 # Say a lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
 
+#The below checks for BsaI restriction sites in the BASIC sequences, and switches codons (keeping AAs the same)
+BsaI = 'GGTCTC'
+BsaI_site = re.compile(BsaI)
 
+for key in BASICs :
+    sequence = BASICs[key]
+    for match in re.finditer(BsaI_site,sequence):
+        index = match.start(0)
+        if index % 3 == 0:
+            sequence = sequence[0 : index + 2] + 'C' + sequence[index + 3 :]
+        elif index  % 3 == 1: 
+            sequence = sequence[0: index + 4] + 'C' + sequence[index + 4:]
+        elif index % 3 == 2:
+            sequence = sequence[0: index + 3] + 'T' + sequence[index + 3:]
+            
+        
