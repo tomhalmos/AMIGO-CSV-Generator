@@ -1,50 +1,32 @@
-#I am doing this in a separate document because I am not sure what I'm doing pls help
-
+#I am doing this in a separate document because I don't want to accidentally mess with the other code
 
 import re
 
-r = "atgggtctcggttggtattggtctcttag"
+r0 = "atgggtctcgtattggtctcttacaggtctctag" 
+r0 = r0.upper()
+r = r0
 r = r.upper()
 print(r)
-matches = re.finditer(r"GGTCTC", r) 
-for m in matches: 
+matches = re.finditer(r"GGTCTC", r) #find the restriction sites
+for m in matches: #scan through the matches
     base = m.group() 
-    pos  = m.start()
-    print(base + " found at position " + str(pos))
-    if pos % 3 == 0:
+    pos  = m.start() #find position within the sequence 
+    print("Restriction site found at position " + str(pos)) #can probably delete this later, just using for troubleshooting
+    if pos % 3 == 0: #if in frame ie XXX GGT TCT XXX
         #r = "".join((r[:pos],"GGG",r[pos+3:])) #Replace just Gly?? 
-        #r = "".join((r[:pos+3],"TTA",r[pos+6:])) #Replace just Leu??
-        r= "".join((r[:pos],"GGGTTA",r[pos+6:]))
-        print(r)
-    else:
-        p = pos % 3
-        pos2 = pos - p
-        c1 = r[pos2:pos2+3]
-        c2 = r[pos2+3:pos2+6]
-        c3 = r[pos2+6:pos2+9]
-        print(c1, c2, c3)
-        #this finds the three codons that are affected by the restriction site
-        #but then I got stuck
-        #search dictionary and replace with one of the other ones
-        
-aa2codons = {"C": ["TGT", "TGC"], 
-              "D": ["GAT", "GAC"], 
-              "S": ["TCT", "TCG", "TCA", "TCC", "AGC", "AGT"], 
-              "Q": ["CAA", "CAG"], 
-              "M": ["ATG"], 
-              "N": ["AAC", "AAT"], 
-              "P": ["CCT", "CCG", "CCA", "CCC"], 
-              "K": ["AAG", "AAA"], 
-              "STOP": ["TAG", "TGA", "TAA"], 
-              "T": ["ACC", "ACA", "ACG", "ACT"], 
-              "A": ["GCA", "GCC", "GCG", "GCT"], 
-              "G": ["GGT", "GGG", "GGA", "GGC"], 
-              "I": ["ATC", "ATA", "ATT"], 
-              "L": ["TTA", "TTG", "CTC", "CTT", "CTG", "CTA"], 
-              "H": ["CAT", "CAC"], 
-              "R": ["CGA", "CGC", "CGG", "CGT", "AGG", "AGA"],
-              "W": ["TGG"], 
-              "V": ["GTA", "GTC", "GTG", "GTT"], 
-              "Y": ["TAT", "TAC"],
-              "F": ["TTT", "TTC"],
-              "E": ["GAG", "GAA"]} 
+        #r = "".join((r[:pos+3],"TTA",r[pos+6:])) #Replace just Leu
+        r= "".join((r[:pos],"GGGTTA",r[pos+6:])) #replace both Gly & Leu
+        print("Restriction site removed at position " + str(pos) + " New sequence: " + str(r))
+    else: #out of frame ie XXG GTC TCX or XGG TCT CXX
+        p = pos % 3 #find how much out of frame it is
+        pos2 = pos - p #find the start of the first codon
+        c2 = r[pos2+3:pos2+6] #find the codon that is JUST restriction site ie GTC or TCT
+        if c2 == "GTC":
+            r= "".join((r[:pos2+3],"GTG",r[pos2+6:])) #replace Val
+            print("Restriction site removed at position " + str(pos) + " New sequence: " + str(r))
+        if c2 == "TCT":
+            r= "".join((r[:pos2+3],"TCC",r[pos2+6:])) #replace Ser
+            print("Restriction site removed at position " + str(pos) + " New sequence: " + str(r))
+
+print("Old sequence: " + str(r0))
+print("New sequence: " + str(r))
