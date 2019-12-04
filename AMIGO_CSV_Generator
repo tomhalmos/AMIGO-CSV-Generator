@@ -10,30 +10,40 @@ import re
 # Ask how many ORFs the user wants to use
 n = input('Input the number of ORFs you would like to use')
 
-IDs = {}    # A dictionary of BASIC part names (Keys) and Ensembl IDs (Values)
+IDs = {}    # A dictionary of GenBank IDs (Keys) and BASIC part names (Values)
 BASICs = {} # A dictionary of BASIC part names (Keys) and BASIC sequence (Values)
 
-# Ask for each Ensembl ID and add it to the IDs list
+# Ask for each GenBank ID and use it as a Key for the BASIC part name
 for i in range(int(n)):
     ID  = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
     Key = input('And now an identifying 3 letter short code: ')
-    IDs[ID] = 'BASIC_'+ Key + '_ORF'
+    IDs[ID] ='BASIC_'+ Key + '_ORF'
     
-# Retrieve the ORF sequence from Ensembl and add BASIC iP/iS 
-server = "https://rest.ensembl.org"
+# Retrieve the ORF sequences from GenBank and format as a single string of nucleotides (FAFF!)
+server = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sequences&id='
 for ID in IDs:
-    r = requests.get(server+'/sequence/id/'+ID,headers={"Content-type" : "text/plain"})
-    #search sequence for BsaI sites
-    #replace any BsaI sites without changing amino acids- might have trouble with frame reading but should be able to just replace codons
-    #search new sequence again to check its now fixed
-    BASICs[IDs[ID]] = 'TCTGGTGGGTCTCTGTCC' + r.text + 'GGCTCGGGAGACCTATCG' 
+    r = requests.get(server +ID+'&rettype=fasta').content.decode('utf-8')
+    l = len(r)  
+    s = ''
+    p1 = re.compile('[AGCT]{70}')
+    p2 = re.compile('\n\n')
+    p3 = re.compile('\n')  
+    for match1 in re.finditer(p1,r):
+        index = match1.start(0)
+        s += r[index:index+70]
+    for match2 in re.finditer(p2,r):
+        for match3 in re.finditer(p3,r[l-20:l-5]):
+            index2 = match2.start(0)
+            index3 = match3.start(0)+len(r)-20
+            x = r[index3+2:index2]
+        s += x
+    BASICs[IDs[ID]] = s
 
-# Say a lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
+# Say a Lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
 
-#The below checks for BsaI restriction sites in the BASIC sequences, and switches codons (keeping AAs the same)
-#If the BsaI site is inframe, 'GGT CTC' is changed to 'GGC CTC'
-#If the BsaI site is 1 step out of frame, 'NGG TCT CNN' is changed to 'NGG TCC CNN'
-#If the BsaI site is 2 steps out, 'NNG GTC TCN' is changed to 'NNG GTT TCN'
+
+#Search for inframe, or cryptic BasI sites, and switch the codons while conserving AAs
+    
 BsaI = 'GGTCTC'
 BsaI_site = re.compile(BsaI)
 
@@ -44,8 +54,10 @@ for key in BASICs :
         if index % 3 == 0:
             sequence = sequence[0 : index + 2] + 'C' + sequence[index + 3 :]
         elif index  % 3 == 1: 
-            sequence = sequence[0: index + 4] + 'C' + sequence[index + 4:]
+            sequence = sequence[0: index + 4] + 'C' + sequence[index + 5:]
         elif index % 3 == 2:
-            sequence = sequence[0: index + 3] + 'T' + sequence[index + 3:]
+            sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:]
+    BASICs.update({key:'GGTCTC' + sequence + 'GAGACC'})
             
+        
         
