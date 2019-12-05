@@ -69,5 +69,45 @@ for key in BASICs :
             sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:] 
     BASICs.update({key:'TCTGGTGGGTCTCTGTCC' + sequence + 'GGCTCGGGAGACCTATCG'})
             
+#Ask user to input desired ratio
+print('Input the desired ratio between your GOIs as three integers between 1 and 100, with the most expressed'
+      'gene as close to 100 as possible. For example, for a desired ratio of 1:5:10, input the numbers 10, 50 and 100'
+      'For a ratio of 0.5:2:7, input 5, 20 and 70. Enter one number at a time, in the same order as the ORFs,'
+      'hitting enter between each.')
+
+ratio = []
+
+for i in range(int(n)):
+    value = input('Enter integer {} '.format(i+1))
+    ratio.append(int(value))
+
+    
+RBS_lib = {1:'N6',2:'N2',15:'N9',21:'N1',35:'N8',48:'N3',55:'RBS2',70:'N7',100:'RBS3'}
+RBS_outputs = [1,2,15,21,35,48,55,70,100]
+output_ratio = []
+RBSs = {}
+
+for r in ratio:
+    x,i = r,1
+    j,k = 0,0
+    while not x in RBS_outputs:
+        x += i
+        j += 1
+    x,i = r,1
+    while not x in RBS_outputs:
+        x -= i
+        k += 1
+    if j < k:
+        r = r + j
+    else:
+        r = r - k
+    output_ratio.append(r)
+
+for r in output_ratio:
+    RBSs[r] = RBS_lib[r]
+    
+#RBSs is now a library of which RBSs are to be used in the same order as the genes were inputed.   
+
+
         
         
