@@ -67,7 +67,7 @@ for key in BASICs :
             sequence = sequence[0: index + 3] + 'G' + sequence[index + 4:]
         elif index % 3 == 2:
             sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:] 
-    BASICs.update({key:'GGTCTC' + sequence + 'GAGACC'})
+    BASICs.update({key:'TCTGGTGGGTCTCTGTCC' + sequence + 'GGCTCGGGAGACCTATCG'})
             
         
         
