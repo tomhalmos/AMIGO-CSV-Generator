@@ -46,6 +46,8 @@ for ID in IDs:
     
 BsaI = 'GGTCTC'
 BsaI_site = re.compile(BsaI)
+BsaIcom = 'GAGACC'
+BsaIcom_site = re.compile(BsaIcom)
 
 for key in BASICs :
     sequence = BASICs[key]
@@ -57,6 +59,14 @@ for key in BASICs :
             sequence = sequence[0: index + 4] + 'C' + sequence[index + 5:]
         elif index % 3 == 2:
             sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:]
+    for match in re.finditer(BsaIcom_site, sequence):
+        index = match.start(0)
+        if index % 3 == 0:
+            sequence = sequence[0 : index + 2] + 'A' + sequence[index + 3 :]
+        elif index  % 3 == 1: 
+            sequence = sequence[0: index + 3] + 'G' + sequence[index + 4:]
+        elif index % 3 == 2:
+            sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:] 
     BASICs.update({key:'GGTCTC' + sequence + 'GAGACC'})
             
         
