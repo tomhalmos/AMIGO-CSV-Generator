@@ -117,15 +117,18 @@ for r in ratio:
     output_ratio.append(r)
 
 for r in output_ratio:
-    RBSs.append(RBS_lib[r])
+    RBSs.append('UTR_{}_'.format(output_ratio.index(r)+1) +  RBS_lib[r])
 
-Backbone = 'BASIC_SEVA_37_CmR-p15A_v1.0'
-Promoter = 'BASIC_L3S2P21_J23101_RiboJ'
+backbone = input('What backbone would you like to use? For the default BASIC_SEVA_37_CmR-p15A_v1.0, just hit enter')
+promoter = input('What promoter would you like to use? For the default L3S2P21_J23101_RiboJ, just hit enter')
+
+if backbone == '':
+    backbone = 'BASIC_SEVA_37_CmR-p15A_v1.0'
+if promoter == '':
+    promoter = 'BASIC_L3S2P21_J23101_RiboJ'
+
 LMS = 'LMS'
 LMP = 'LMP'
-
-#Print an example construct
-print(LMS + ' ' + Backbone + ' ' + LMP + ' ' + Promoter + ' ' + RBSs[0]+ '_' + B_code[0] )
 
 
        
