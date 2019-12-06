@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -10,18 +11,21 @@ import re
 # Ask how many ORFs the user wants to use
 n = input('Input the number of ORFs you would like to use')
 
-IDs = {}    # A dictionary of GenBank IDs (Keys) and BASIC part names (Values)
-BASICs = {} # A dictionary of BASIC part names (Keys) and BASIC sequence (Values)
+GB_IDs = []
+B_code = []
+B_seq  = []
+B_seq2 = []
 
 # Ask for each GenBank ID and use it as a Key for the BASIC part name
 for i in range(int(n)):
     ID  = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
-    Key = input('And now an identifying 3 letter short code: ')
-    IDs[ID] ='BASIC_'+ Key + '_ORF'
+    Code = input('And now an identifying 3 letter short code: ')
+    GB_IDs.append(ID)
+    B_code.append('BASIC_'+ Code + '_ORF')
     
 # Retrieve the ORF sequences from GenBank and format as a single string of nucleotides (FAFF!)
 server = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sequences&id='
-for ID in IDs:
+for ID in GB_IDs:
     r = requests.get(server +ID+'&rettype=fasta').content.decode('utf-8')
     l = len(r)  
     s = ''
@@ -37,7 +41,7 @@ for ID in IDs:
             index3 = match3.start(0)+len(r)-20
             x = r[index3+2:index2]
         s += x
-    BASICs[IDs[ID]] = s
+    B_seq.append(s)
 
 # Say a Lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
 
@@ -49,25 +53,24 @@ BsaI_site = re.compile(BsaI)
 BsaIcom = 'GAGACC'
 BsaIcom_site = re.compile(BsaIcom)
 
-for key in BASICs :
-    sequence = BASICs[key]
-    for match in re.finditer(BsaI_site,sequence):
+for seq in B_seq :
+    for match in re.finditer(BsaI_site,seq):
         index = match.start(0)
         if index % 3 == 0:
-            sequence = sequence[0 : index + 2] + 'C' + sequence[index + 3 :]
+            seq = seq[0 : index + 2] + 'C' + seq[index + 3 :]
         elif index  % 3 == 1: 
-            sequence = sequence[0: index + 4] + 'C' + sequence[index + 5:]
+            seq = seq[0: index + 4] + 'C' + seq[index + 5:]
         elif index % 3 == 2:
-            sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:]
-    for match in re.finditer(BsaIcom_site, sequence):
+            seq = seq[0: index + 3] + 'T' + seq[index + 4:]
+    for match in re.finditer(BsaIcom_site, seq):
         index = match.start(0)
         if index % 3 == 0:
-            sequence = sequence[0 : index + 2] + 'A' + sequence[index + 3 :]
+            seq = seq[0 : index + 2] + 'A' + seq[index + 3 :]
         elif index  % 3 == 1: 
-            sequence = sequence[0: index + 3] + 'G' + sequence[index + 4:]
+            seq = seq[0: index + 3] + 'G' + seq[index + 4:]
         elif index % 3 == 2:
-            sequence = sequence[0: index + 3] + 'T' + sequence[index + 4:] 
-    BASICs.update({key:'TCTGGTGGGTCTCTGTCC' + sequence + 'GGCTCGGGAGACCTATCG'})
+            seq = seq[0: index + 3] + 'T' + seq[index + 4:] 
+    B_seq2.append('TCTGGTGGGTCTCTGTCC' + seq + 'GGCTCGGGAGACCTATCG')
             
 #Ask user to input desired ratio
 print('Input the desired ratio between your GOIs as three integers between 1 and 100, with the most expressed'
@@ -83,9 +86,19 @@ for i in range(int(n)):
 
     
 RBS_lib = {1:'N6',2:'N2',15:'N9',21:'N1',35:'N8',48:'N3',55:'RBS2',70:'N7',100:'RBS3'}
+RBS_lib2 = {'N6':'ATCCGGGGAGGTA',
+            'N2':'ATCCAGGGAGGTA',
+            'N9':'ATCTCAGGAGGTA',
+            'N1':'ATCCAAGGAGGTA',
+            'N8':'ATCTAGGGAGGTA',
+            'N3':'ATCCCAGGAGGTA',
+            'N7':'ATCTAAGGAGGTA',
+            'RBS2':'AAAGAGGGGAAATA',
+            'RBS3':'AAAGAGGAGAAATA'}
+
 RBS_outputs = [1,2,15,21,35,48,55,70,100]
 output_ratio = []
-RBSs = {}
+RBSs = []
 
 for r in ratio:
     x,i = r,1
@@ -104,10 +117,15 @@ for r in ratio:
     output_ratio.append(r)
 
 for r in output_ratio:
-    RBSs[r] = RBS_lib[r]
-    
-#RBSs is now a library of which RBSs are to be used in the same order as the genes were inputed.   
+    RBSs.append(RBS_lib[r])
+
+Backbone = 'BASIC_SEVA_37_CmR-p15A_v1.0'
+Promoter = 'BASIC_L3S2P21_J23101_RiboJ'
+LMS = 'LMS'
+LMP = 'LMP'
+
+#Print an example construct
+print(LMS + ' ' + Backbone + ' ' + LMP + ' ' + Promoter + ' ' + RBSs[0]+ '_' + B_code[0] )
 
 
-        
-        
+       
