@@ -1,31 +1,13 @@
 # AMIGO-CSV-Generator
 
-The code will generate the CSV file for DNA-BOT taking five ORFs and desired gene ratios as inputs. Unless specified, the plasmid, promoter and UTRs will have default settings.
+The code will generate the CSV file for DNA-BOT taking any number of genes and a desired output ratio. Unless specified, the backbone, promoter and UTRs will have default settings.
 
-So I've made one Python file and will add it to this repository. Pick a task from the below, fork the Python file, work on your code and then when it's ready, merge it into the master file. If your bit of code needs inputs from another bit just input your own variables when testing it and we'll sort that out when we stitch it all together. If anyone (Will) knows a better way to use GitHub pls explain aha. 
-
-INPUT: PDB IDs (Up to 5) + Desired Ratio
+INPUT: GenBank IDs (from the NUCLEOTIDE database), 3 letter code for each gene, gene output ratio
 OUTPUT: BASIC sequences for synthesis + CSV file for DNA BOT
 
-Code needs to be written to:
-TOM: 1) Take up to five ORFs as PBD IDs as user input and reuturn BASIC sequence
-      -- Look up sequence in PBD
-      -- Add standardised prefix/suffix sequences
-      -- ADDITION: we need to search the sequence for any internal BsaI sites and remove them!
-      -- Generate standardised name
-      -- Add to a local registry of parts
-     2) Take the desired gene ratio as input 
-      -- Figure out best way to input this (same order as PBD IDs?)
-      -- Using sfGFP data find combination of RBSs
-      -- Return standardised name for RBSs + UTR(1-5)
-    3) Allow user to change plasmid, promoter if they want
-    -- Promoter can be selected from weak, medium or strong
-    -- Plasmid can be selected based on antibiotic resistance and/or copy number
-    4) Create a CSV file with 1 line (no combinations)
-      -- Add the LMP/LMS linkers, make sure the ORFs are added with the correct RBS
-    5) Take the one line CSV and generate all possible combinations
-      -- Keeping RBS/UTR with ORF
-      -- Plasmid/promoter parts don't move
-      -- Return CSV file and BASIC sequences (email to user?)
+The code is now fully up and running, please have a go and let me know any errors/problems. 
+Pulling out the nucleotide sequence from the FASTA file you get from the server request was an absolute faff (any improvement appreciated). Thinking that GenBank isn't the best database to use, but the SynBioHub API didn't work so...
+
+The way I pick out RBSs also feels a bit odd. I've taken the relative output of each RBSs and scaled them up to run between 1 and 100. So input the ratio you want with the highest number as close to, but lower than, 100. i.e for a ratio of 1:5:10, input 10:50:100. Keeping everything as integers just made the code a bit easier as working with an output of 1 rather than 0.01. 
 
 
