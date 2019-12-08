@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -8,22 +7,24 @@ Created on Tue Nov 26 15:01:46 2019
 import requests
 import re
 import csv
+import itertools
+import math
 
 # Ask how many ORFs the user wants to use
 n = input('Input the number of ORFs you would like to use')
 
-GB_IDs = []
-B_code = []
-B_seq  = []
-B_seq2 = []
+GB_IDs = [] #For the GenBank IDs
+B_code = [] #For the Part Code
+B_seq  = [] #For the Part Sequence
+B_seq2 = [] #For the BASIC Part Sequence
 
-# Ask for each GenBank ID and use it as a Key for the BASIC part name
+# Ask for each GenBank ID, and a 3 letter code to generate a Part name
 for i in range(int(n)):
     ID  = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
     Code = input('And now an identifying 3 letter short code: ')
     GB_IDs.append(ID)
     B_code.append('BASIC_'+ Code + '_ORF')
-    
+   
 # Retrieve the ORF sequences from GenBank and format as a single string of nucleotides (FAFF!)
 server = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sequences&id='
 for ID in GB_IDs:
@@ -33,22 +34,22 @@ for ID in GB_IDs:
     p1 = re.compile('[AGCT]{70}')
     p2 = re.compile('\n\n')
     p3 = re.compile('\n')  
+    #Add each 70 nucleotide row to sequence
     for match1 in re.finditer(p1,r):
         index = match1.start(0)
         s += r[index:index+70]
+    #Find the last row (<70N), and pick out the nucleotides, avoiding \n characters
     for match2 in re.finditer(p2,r):
+        z = ''
         for match3 in re.finditer(p3,r[l-20:l-5]):
             index2 = match2.start(0)
             index3 = match3.start(0)+len(r)-20
-            x = r[index3+2:index2]
-        s += x
+            z = r[index3+2:index2]
+        s += z
     B_seq.append(s)
 
-# Say a Lactase gene was imported, with the short code 'LAC', the sequence would be indexed by BASICs['BASIC_LAC_ORF']
-
-
-#Search for inframe, or cryptic BasI sites, and switch the codons while conserving AAs
-    
+#Search for inframe, cryptic, or reverse strand BasI sites, and switch the codons while conserving AAs
+  
 BsaI = 'GGTCTC'
 BsaI_site = re.compile(BsaI)
 BsaIcom = 'GAGACC'
@@ -73,72 +74,96 @@ for seq in B_seq :
             seq = seq[0: index + 3] + 'T' + seq[index + 4:] 
     B_seq2.append('TCTGGTGGGTCTCTGTCC' + seq + 'GGCTCGGGAGACCTATCG')
             
-#Ask user to input desired ratio
-print('Input the desired ratio between your GOIs as three integers between 1 and 100, with the most expressed'
+#Ask user to input desired gene ratio
+print('Input the desired ratio between your genes as three integers between 1 and 100, with the most expressed'
       'gene as close to 100 as possible. For example, for a desired ratio of 1:5:10, input the numbers 10, 50 and 100'
-      'For a ratio of 0.5:2:7, input 5, 20 and 70. Enter one number at a time, in the same order as the ORFs,'
+      'For a ratio of 0.5:2:7, input 5, 20 and 70. Enter one number at a time, in the same order as the GenBank IDs,'
       'hitting enter between each.')
 
 ratio = []
-
 for i in range(int(n)):
     value = input('Enter integer {} '.format(i+1))
     ratio.append(int(value))
 
     
 RBS_lib = {1:'N6',2:'N2',15:'N9',21:'N1',35:'N8',48:'N3',55:'RBS2',70:'N7',100:'RBS3'}
-RBS_lib2 = {'N6':'ATCCGGGGAGGTA',
-            'N2':'ATCCAGGGAGGTA',
-            'N9':'ATCTCAGGAGGTA',
-            'N1':'ATCCAAGGAGGTA',
-            'N8':'ATCTAGGGAGGTA',
-            'N3':'ATCCCAGGAGGTA',
-            'N7':'ATCTAAGGAGGTA',
-            'RBS2':'AAAGAGGGGAAATA',
-            'RBS3':'AAAGAGGAGAAATA'}
-
 RBS_outputs = [1,2,15,21,35,48,55,70,100]
 output_ratio = []
 RBSs = []
 
+#The following takes each number of the ratio and finds the closest RBS that gives that output
 for r in ratio:
     x,i = r,1
     j,k = 0,0
+    #Use j as a counter to see the closest RBS ABOVE the input
     while not x in RBS_outputs:
         x += i
         j += 1
     x,i = r,1
+    #Use k as a counter to see the closest RBS BELOW the input
     while not x in RBS_outputs:
         x -= i
         k += 1
+    #See whether the RBS above or below is closest and pick that one
     if j < k:
         r = r + j
     else:
         r = r - k
     output_ratio.append(r)
-
+#Pick out the correct RBSs from the library and add a UTR
 for r in output_ratio:
     RBSs.append('UTR_{}_'.format(output_ratio.index(r)+1) + 'RBS_' + RBS_lib[r])
 
-bb = input('What backbone would you like to use? For the default BASIC_SEVA_37_CmR-p15A_v1.0, just hit enter')
-pro = input('What promoter would you like to use? For the default L3S2P21_J23101_RiboJ, just hit enter')
+#Ask for input on BackBone and Promoter (hit enter for defaults)
+BB = input('What backbone would you like to use? For the default BASIC_SEVA_37_CmR-p15A_v1.0, just hit enter')
+Pro = input('What promoter would you like to use? For the default L3S2P21_J23101_RiboJ, just hit enter')
 
-if bb == '':
-    bb = 'BASIC_SEVA_37_CmR-p15A_v1.0'
-if pro == '':
-    pro = 'BASIC_L3S2P21_J23101_RiboJ'
+if BB == '':
+    BB = 'BASIC_SEVA_37_CmR-p15A_v1.0'
+if Pro == '':
+    Pro = 'BASIC_L3S2P21_J23101_RiboJ'
 
-well = 'A1'
-LMS = 'LMS'
-LMP = 'LMP'
-#So, we now have a backbone, promoter and LMS/LMP linker parts stored under those names
-#RBSs are stored with their UTR in the RBSs list in the same order as the names of the ORFs in the B_code list. 
+#Define empty(ish) lists for Wells and Headers for the CSV file 
+Wells = []
+Headers= ['Well']
+Linkers = ['LMS','LMP']
 
-#Now generate the csv file with the first row
-    
+i = 1
+j = math.factorial(int(n))
+
+while i < j+1:
+    #Append A1,B1,C1...factorial(n) to Wells
+    Wells.append(chr(i+64)+'1')
+    #Append Linker1,Part1,Linker2,Part2...factorial(n) to Headers
+    Headers.append('Linker{}'.format(i))
+    Headers.append('Part{}'.format(i))
+    i += 1
+
+#Define a list of possible permutations of all the parts
+permutations = list(itertools.permutations(list(range(int(n)))))
+
+#Define an empty library with row number as a Key and the combinatino of parts as the Value
+rows = {}
+
+for i in range(j):
+    #Pick out one permuation
+    order = permutations[i]
+    #Add the well, LMS, BB, LMP, Promoter to every row
+    row = [Wells[i],Linkers[0],BB,Linkers[1],Pro]
+    #Add the RBSs and BASIC Part in the order specified by 'order'
+    for index in order:
+        row.append(RBSs[index])
+        row.append(B_code[index])
+    #Add this row to the library
+    rows[i] = row
+
+#Create the CSV file 'AMIGO_CSV.csv', write the headers and then add each row in the Rows library
 with open('AMIGO_CSV.csv', 'w', newline = '') as file:
     writer = csv.writer(file)
-    writer.writerow([well,LMS,bb,LMP,pro,RBSs[0],B_code[0]])
+    writer.writerow(Headers)
+    for i in range(j):
+        writer.writerow(rows[i])
+
 
     
     
@@ -148,4 +173,4 @@ with open('AMIGO_CSV.csv', 'w', newline = '') as file:
     
     
     
-       
+    
