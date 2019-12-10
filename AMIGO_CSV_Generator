@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Mon Dec  9 14:54:49 2019
+
+@author: Tom
+"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Tue Nov 26 15:01:46 2019
 @author: Tom
 """
@@ -11,7 +18,7 @@ import itertools
 import math
 
 # Ask how many ORFs the user wants to use
-n = input('Input the number of ORFs you would like to use')
+n = input('Input the number of ORFs you would like to use ')
 
 GB_IDs = [] #For the GenBank IDs
 B_code = [] #For the Part Code
@@ -20,7 +27,7 @@ B_seq2 = [] #For the BASIC Part Sequence
 
 # Ask for each GenBank ID, and a 3 letter code to generate a Part name
 for i in range(int(n)):
-    ID  = input('Enter the Ensembl ID of ORF {}: '.format(i+1))
+    ID  = input('Enter the GenBank Nucleotide ID of ORF {}: '.format(i+1))
     Code = input('And now an identifying 3 letter short code: ')
     GB_IDs.append(ID)
     B_code.append('BASIC_'+ Code + '_ORF')
@@ -165,12 +172,14 @@ with open('AMIGO_CSV.csv', 'w', newline = '') as file:
         writer.writerow(rows[i])
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
+with open('BASIC_PART_SEQUENCES.txt','w') as file:
+    for i in range(int(n)):
+        file.write('Sequence for {} (ID: {})'.format(B_code[i],GB_IDs[i])+"\n")
+        file.write("\n")
+        file.write(B_seq2[i])
+        file.write("\n")
+        file.write("\n")
+        
+
+
+
